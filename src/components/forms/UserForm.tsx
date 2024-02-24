@@ -19,6 +19,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { createUser } from "@/lib/actions/user.actions";
+import { revalidatePath } from "next/cache";
 
 export function UserForm() {
   // 1. Define your form.
@@ -28,10 +30,16 @@ export function UserForm() {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof UserValidationSchema>) {
+  async function onSubmit(values: z.infer<typeof UserValidationSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    const res = await createUser(values.username);
+    if (res !== "User created") {
+      form.setError("username", {
+        type: "manual",
+        message: res,
+      });
+    }
   }
 
   return (
