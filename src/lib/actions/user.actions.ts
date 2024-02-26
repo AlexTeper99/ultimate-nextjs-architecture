@@ -32,10 +32,17 @@ export async function createUser(username: string) {
     if (user) {
       throw new Error("Username already exists");
     }
+    // throw new Error(" error");
     await User.create({ id: Math.random() * 100, username });
+
     revalidatePath("/");
     return "User created";
   } catch (error: any) {
-    return `Failed to create user: ${error.message}`;
+    if (error.message.includes("Username already exists")) {
+      return { error: "Username already exists" };
+    } else {
+      revalidatePath("/");
+      return { error: `Failed to create user: ${error.message}` };
+    }
   }
 }
